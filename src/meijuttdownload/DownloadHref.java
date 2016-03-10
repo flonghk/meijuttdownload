@@ -17,6 +17,10 @@ import java.io.FileWriter;
 import java.io.IOException;  
 import java.io.InputStreamReader;  
 
+import java.util.Date;
+import java.util.Calendar; 
+import java.text.SimpleDateFormat;
+
 import meijuttsearch.SearchTV;
 
 public class DownloadHref {
@@ -43,6 +47,18 @@ public class DownloadHref {
 		listTVName.add("灵书妙探第八季");
 		listTVName.add("福尔摩斯：基本演绎法第四季");
 		
+		Calendar calendar = Calendar.getInstance();//可以对每个时间域单独修改
+
+		int year = calendar.get(Calendar.YEAR); 
+		int month = calendar.get(Calendar.MONTH); 
+		int date = calendar.get(Calendar.DATE); 
+		int hour = calendar.get(Calendar.HOUR_OF_DAY); 
+		int minute = calendar.get(Calendar.MINUTE); 
+		int second = calendar.get(Calendar.SECOND); 
+		
+		String time = "启动时间：" + year + "年" + month + "月" + date + "日" + hour + "时" + minute + "分" + second + "秒";
+				
+		System.out.println(time);
 		
 		List<String> listTVHref = searchTV.listsearch(listTVName);
 		
@@ -65,33 +81,52 @@ public class DownloadHref {
 		
 			System.out.println(tvName.getText());
 			
-			File file = new File(tvName.getText()+".txt");
-			FileWriter fw = null;
-	        BufferedWriter writer = null;
-	        fw = new FileWriter(file);
-            writer = new BufferedWriter(fw);
+			String fileName = tvName.getText()+".txt";
+			
+			File file = new File(fileName);
+			
+		    if(!file.exists())   
+		    {   
+		        try {   
+		            file.createNewFile();   
+		        } catch (IOException e) {   
+		            // TODO Auto-generated catch block   
+		            e.printStackTrace();   
+		        }   
+		    } 
+		    
+			//FileWriter fw = null;
+	        //BufferedWriter writer = null;
+	        //fw = new FileWriter(file);
+            //writer = new BufferedWriter(fw);
 			List<WebElement> listElement = dr.findElements(By.xpath("//*[@id='jishu']/div/ul/li"));
 		
 			List<WebElement> listElement1 = dr.findElements(By.xpath("//*[@id='jishu']/div/ul/li/div[1]/div/span"));
 		
 			List<WebElement> listElement2 = dr.findElements(By.xpath("//*[@id='jishu']/div/ul/li/div[1]/div/input"));
-			writer.write(listElement1.get(0).getText().toString() + "-" + listElement1.get(listElement.size()-1).getText().toString());
-            writer.newLine();
+			//writer.write(listElement1.get(0).getText().toString() + "-" + listElement1.get(listElement.size()-1).getText().toString());
+            //writer.newLine();
+			//从第几集到第几集
+			String beginToEnd = listElement1.get(0).getText().toString() + "-" + listElement1.get(listElement.size()-1).getText().toString();
+			appendMethod(fileName,time);
+			appendMethod(fileName,beginToEnd);
 			for (int i = 0; i < listElement.size(); i++)
 			{
 				System.out.println(listElement1.get(i).getText());
 				System.out.println(listElement2.get(i).getAttribute("value"));
 				
+				String downloadHref = listElement2.get(i).getAttribute("value").toString();
 				
-				writer.write(listElement2.get(i).getAttribute("value").toString());
-                writer.newLine();
+				appendMethod(fileName,downloadHref);
+				//writer.write(listElement2.get(i).getAttribute("value").toString());
+                //writer.newLine();
 				//System.out.println(listElement.get(i).findElement(arg0));
 				//System.out.println(listElement.get(i).findElement(By.xpath("/div[@class='adds']/div/span")).getText() 
 				//		+ listElement.get(i).findElement(By.xpath("/div/input[@type = 'text']")).getAttribute("value"));
 			}
-			writer.flush();
-			writer.close();
-            fw.close();
+			//writer.flush();
+			//writer.close();
+            //fw.close();
 			System.out.println();
 		
 			Thread.sleep(1000);
@@ -102,5 +137,29 @@ public class DownloadHref {
 		
 		System.out.println("浏览器已关闭");
 	}
+	
+    /** 
+     * 追加文件：使用FileWriter 
+     *  
+     * @param fileName 
+     * @param content 
+     */  
+    public static void appendMethod(String fileName, String content) {  
+        try {  
+            // 打开一个写文件器，构造函数中的第二个参数true表示以追加形式写文件  
+			//FileWriter fw = null;
+	        //BufferedWriter writer = null;
+	        //fw = new FileWriter(file);
+            //writer = new BufferedWriter(fw);
+            FileWriter fw = new FileWriter(fileName, true); 
+            BufferedWriter writer = new BufferedWriter(fw);
+            writer = new BufferedWriter(fw);
+            writer.write(content);  
+            writer.newLine();
+            writer.close();  
+        } catch (IOException e) {  
+            e.printStackTrace();  
+        }  
+    }  
 
 }
